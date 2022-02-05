@@ -19,9 +19,8 @@ class SubjectController {
     private lateinit var subjectService: SubjectService
 
     @GetMapping("/{teamId}")
-    fun getSubjectsByTeamId(@PathVariable teamId: Long): ResponseEntity<List<SubjectResponse>> {
-        return ResponseEntity.ok(subjectService.getSubjectsByTeamId(teamId))
-    }
+    fun getSubjectsByTeamId(@PathVariable teamId: Long): ResponseEntity<List<SubjectResponse>> =
+        ResponseEntity.ok(subjectService.getSubjectsByTeamId(teamId))
 
     @PostMapping
     fun setSubject(@RequestBody subjectRequest: SubjectRequest): ResponseEntity<Void> {
