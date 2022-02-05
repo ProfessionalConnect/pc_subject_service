@@ -11,6 +11,8 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+        jdbc:
+          batch_size: 100
     database-platform: org.hibernate.dialect.H2Dialect
   h2:
     console:
