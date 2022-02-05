@@ -14,19 +14,12 @@ data class SubjectResponse(
     val codeType: String,
 ) {
     companion object {
-        fun of(subject: Subject): SubjectResponse {
-            return SubjectResponse(
-                subject.id,
-                subject.teamId,
-                subject.uuid,
-                subject.title,
-                subject.description,
-                subject.codeType.name
-            )
-        }
+        fun of(subject: Subject): SubjectResponse =
+            SubjectResponse(subject.id, subject.teamId, subject.uuid, subject.title, subject.description, subject.codeType.name)
 
-        fun listOf(subjectList: List<Subject>): List<SubjectResponse> {
-            return subjectList.map(SubjectResponse::of)
-        }
+
+        fun listOf(subjectList: List<Subject>): List<SubjectResponse> =
+            subjectList.map(SubjectResponse::of)
+
     }
 }
