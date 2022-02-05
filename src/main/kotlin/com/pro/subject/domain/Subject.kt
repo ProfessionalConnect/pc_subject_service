@@ -40,4 +40,7 @@ class Subject(
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     var codeType = codeType
+
+    @OneToMany(mappedBy = "subject", cascade = [(CascadeType.PERSIST)], orphanRemoval = true)
+    var testCaseList = mutableListOf<TestCase>()
 }
