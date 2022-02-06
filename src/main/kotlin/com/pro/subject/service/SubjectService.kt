@@ -1,9 +1,6 @@
 package com.pro.subject.service
 
-import com.pro.subject.dto.ExecResponse
-import com.pro.subject.dto.GradeRequest
-import com.pro.subject.dto.SubjectRequest
-import com.pro.subject.dto.SubjectResponse
+import com.pro.subject.dto.*
 
 /**
  * Created by Minky on 2022-02-05
@@ -11,6 +8,10 @@ import com.pro.subject.dto.SubjectResponse
 
 interface SubjectService {
     fun getSubjectsByTeamId(teamId: Long): List<SubjectResponse>
-    fun setSubject(subjectRequest: SubjectRequest): Long?
-    fun setGrade(gradeRequest: GradeRequest): ExecResponse
+    fun getSubject(subjectId: Long): SubjectResponse
+    fun setSubject(uuid: String, subjectRequest: SubjectRequest): Long?
+    fun setGrade(uuid: String, gradeRequest: GradeRequest): ExecResponse
+    fun getGradeBySubjectAndUUID(uuid: String, subjectId: Long): List<GradeResponse>
+    fun getGradeBySubject(subjectId: Long): List<GradeResponse>
+    fun getGradeByUUID(uuid: String): List<GradeResponse>
 }
