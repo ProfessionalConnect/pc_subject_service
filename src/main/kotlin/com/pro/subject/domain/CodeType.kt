@@ -6,6 +6,6 @@ package com.pro.subject.domain
 enum class CodeType {
     JAVA,
     C,
-    C_PLUS_PLUS,
+    CPP,
     PYTHON,
 }
