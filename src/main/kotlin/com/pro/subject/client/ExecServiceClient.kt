@@ -3,7 +3,6 @@ package com.pro.subject.client
 import com.pro.subject.dto.ExecRequest
 import com.pro.subject.dto.ExecResponse
 import org.springframework.cloud.openfeign.FeignClient
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
@@ -14,6 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody
 @FeignClient(name = "exec-service")
 interface ExecServiceClient {
 
-    @PostMapping
-    fun matchTestCases(@RequestBody execRequest: ExecRequest): ResponseEntity<ExecResponse>
+    @PostMapping("/api/v1/exec")
+    fun matchTestCases(@RequestBody execRequest: ExecRequest): ExecResponse
 }
