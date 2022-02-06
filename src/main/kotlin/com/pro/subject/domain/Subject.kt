@@ -43,4 +43,7 @@ class Subject(
 
     @OneToMany(mappedBy = "subject", cascade = [(CascadeType.PERSIST)], orphanRemoval = true)
     var testCaseList = mutableListOf<TestCase>()
+
+    @OneToMany(mappedBy = "subject", cascade = [(CascadeType.PERSIST)], orphanRemoval = true)
+    var gradeList = mutableListOf<Grade>()
 }
