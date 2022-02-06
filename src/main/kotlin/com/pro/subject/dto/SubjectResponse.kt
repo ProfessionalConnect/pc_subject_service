@@ -17,9 +17,7 @@ data class SubjectResponse(
         fun of(subject: Subject): SubjectResponse =
             SubjectResponse(subject.id, subject.teamId, subject.uuid, subject.title, subject.description, subject.codeType.name)
 
-
         fun listOf(subjectList: List<Subject>): List<SubjectResponse> =
             subjectList.map(SubjectResponse::of)
-
     }
 }

@@ -8,13 +8,12 @@ import com.pro.subject.domain.Subject
  */
 data class SubjectRequest(
     val teamId: Long,
-    val uuid: String,
     val title: String,
     val description: String,
     val correctCode: String,
     val codeType: String,
     val testArguments: List<TestArgumentRequest>,
 ) {
-    fun toEntity(): Subject =
+    fun toEntity(uuid: String): Subject =
         Subject(teamId, uuid, title, description, correctCode, CodeType.valueOf(codeType))
 }
