@@ -1,5 +1,7 @@
 package com.pro.subject.service
 
+import com.pro.subject.dto.ExecResponse
+import com.pro.subject.dto.GradeRequest
 import com.pro.subject.dto.SubjectRequest
 import com.pro.subject.dto.SubjectResponse
 
@@ -10,4 +12,5 @@ import com.pro.subject.dto.SubjectResponse
 interface SubjectService {
     fun getSubjectsByTeamId(teamId: Long): List<SubjectResponse>
     fun setSubject(subjectRequest: SubjectRequest): Long?
+    fun setGrade(gradeRequest: GradeRequest): ExecResponse
 }
