@@ -1,5 +1,7 @@
 package com.pro.subject.controller
 
+import com.pro.subject.dto.ExecResponse
+import com.pro.subject.dto.GradeRequest
 import com.pro.subject.dto.SubjectRequest
 import com.pro.subject.dto.SubjectResponse
 import com.pro.subject.service.SubjectService
@@ -27,4 +29,8 @@ class SubjectController {
         val subjectId = subjectService.setSubject(subjectRequest)
         return ResponseEntity.created(URI("/api/v1/subjects/${subjectId}")).build()
     }
+
+    @PostMapping("/register")
+    fun setGrade(@RequestBody gradeRequest: GradeRequest): ResponseEntity<ExecResponse> =
+        ResponseEntity.ok(subjectService.setGrade(gradeRequest))
 }
