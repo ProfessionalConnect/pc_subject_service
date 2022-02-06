@@ -28,7 +28,9 @@ class SubjectServiceImplement: SubjectService {
         var testCaseList = mutableListOf<TestCase>()
 
         for (testArgument in subjectRequest.testArguments) {
-            testCaseList.add(TestCase(subject, testArgument))
+            testCaseList.add(
+                TestCase(subject, testArgument.testArgument, testArgument.matchResult)
+            )
         }
 
         testCaseRepository.saveAll(testCaseList)

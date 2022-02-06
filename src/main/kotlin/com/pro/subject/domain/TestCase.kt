@@ -11,6 +11,7 @@ import javax.persistence.*
 class TestCase(
     subject: Subject,
     testArgument: String,
+    matchResult: String,
 ): BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "testcase_sequence_gen")
@@ -24,4 +25,7 @@ class TestCase(
 
     @Column(nullable = false)
     var testArgument = testArgument
+
+    @Column(nullable = false)
+    var matchResult = matchResult
 }
