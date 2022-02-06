@@ -13,7 +13,7 @@ data class SubjectRequest(
     val description: String,
     val correctCode: String,
     val codeType: String,
-    val testArguments: List<TestRequest>,
+    val testArguments: List<TestArgumentRequest>,
 ) {
     fun toEntity(): Subject =
         Subject(teamId, uuid, title, description, correctCode, CodeType.valueOf(codeType))

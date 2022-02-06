@@ -1,5 +1,6 @@
 package com.pro.subject.service.implement
 
+import com.pro.subject.client.ExecServiceClient
 import com.pro.subject.domain.TestCase
 import com.pro.subject.dto.SubjectRequest
 import com.pro.subject.dto.SubjectResponse
@@ -19,6 +20,8 @@ class SubjectServiceImplement: SubjectService {
     private lateinit var subjectRepository: SubjectRepository
     @Autowired
     private lateinit var testCaseRepository: TestCaseRepository
+    @Autowired
+    private lateinit var execServiceClient: ExecServiceClient
 
     override fun getSubjectsByTeamId(teamId: Long) = SubjectResponse.listOf(subjectRepository.findByTeamId(teamId))
 
