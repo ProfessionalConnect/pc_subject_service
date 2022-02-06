@@ -1,5 +1,6 @@
 package com.pro.subject.repository
 
+import com.pro.subject.domain.Subject
 import com.pro.subject.domain.TestCase
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
@@ -10,4 +11,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TestCaseRepository: JpaRepository<TestCase, Long> {
+    fun findBySubject(subject: Subject): List<TestCase>
 }
