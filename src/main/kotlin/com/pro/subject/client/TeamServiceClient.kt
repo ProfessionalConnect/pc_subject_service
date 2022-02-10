@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 @FeignClient(name = "team-service")
 interface TeamServiceClient {
 
-    @GetMapping("/api/v1/teams/{teamId}/members/match")
+    @GetMapping("/api/v1/teams/members/{teamId}/match")
     fun validateUserTargetTeamMember(
         @RequestHeader(value = "uuid") uuid: String,
         @PathVariable teamId: Long
