@@ -38,7 +38,7 @@ class SubjectController {
         return ResponseEntity.created(URI("/api/v1/subjects/${subjectId}")).build()
     }
 
-    @GetMapping("/ps/{subjectId}/grades/master")
+    @GetMapping("/ps/{subjectId}/grades")
     fun getGradeBySubject(
         @PathVariable subjectId: Long
     ): ResponseEntity<List<GradeResponse>> =
