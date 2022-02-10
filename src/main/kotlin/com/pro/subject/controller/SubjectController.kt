@@ -17,19 +17,19 @@ class SubjectController {
     @Autowired
     private lateinit var subjectService: SubjectService
 
-    @GetMapping("/teams/{teamId}")
+    @GetMapping("/ms/teams/{teamId}")
     fun getSubjectsByTeamId(
         @PathVariable teamId: Long,
     ): ResponseEntity<List<SubjectResponse>> =
         ResponseEntity.ok(subjectService.getSubjectsByTeamId(teamId))
 
-    @GetMapping("/{subjectId}")
+    @GetMapping("/ms/{subjectId}")
     fun getSubject(
         @PathVariable subjectId: Long,
     ): ResponseEntity<SubjectResponse> =
         ResponseEntity.ok(subjectService.getSubject(subjectId))
 
-    @PostMapping
+    @PostMapping("/ps")
     fun setSubject(
         @RequestBody subjectRequest: SubjectRequest,
         @RequestHeader(value = "uuid") uuid: String
@@ -38,27 +38,27 @@ class SubjectController {
         return ResponseEntity.created(URI("/api/v1/subjects/${subjectId}")).build()
     }
 
-    @PostMapping("/register")
+    @GetMapping("/ps/{subjectId}/grades/master")
+    fun getGradeBySubject(
+        @PathVariable subjectId: Long
+    ): ResponseEntity<List<GradeResponse>> =
+        ResponseEntity.ok(subjectService.getGradeBySubject(subjectId))
+
+    @PostMapping("/ss/register")
     fun setGrade(
         @RequestBody gradeRequest: GradeRequest,
         @RequestHeader(value = "uuid") uuid: String
     ): ResponseEntity<ExecResponse> =
         ResponseEntity.ok(subjectService.setGrade(uuid, gradeRequest))
 
-    @GetMapping("/{subjectId}/grades")
+    @GetMapping("/ss/{subjectId}/grades")
     fun getGradeBySubjectAndUUID(
         @RequestHeader(value = "uuid") uuid: String,
         @PathVariable subjectId: Long
     ): ResponseEntity<List<GradeResponse>> =
         ResponseEntity.ok(subjectService.getGradeBySubjectAndUUID(uuid, subjectId))
 
-    @GetMapping("/{subjectId}/grades/master")
-    fun getGradeBySubject(
-        @PathVariable subjectId: Long
-    ): ResponseEntity<List<GradeResponse>> =
-        ResponseEntity.ok(subjectService.getGradeBySubject(subjectId))
-
-    @GetMapping("/grades")
+    @GetMapping("/ss/grades")
     fun getGradeByUUID(
         @RequestHeader(value = "uuid") uuid: String
     ): ResponseEntity<List<GradeResponse>> =
