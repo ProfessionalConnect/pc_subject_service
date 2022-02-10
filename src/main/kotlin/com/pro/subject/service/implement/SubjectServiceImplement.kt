@@ -1,12 +1,17 @@
 package com.pro.subject.service.implement
 
 import com.pro.subject.client.ExecServiceClient
+import com.pro.subject.client.TeamServiceClient
+import com.pro.subject.domain.ResultType
 import com.pro.subject.domain.TestCase
 import com.pro.subject.dto.*
+import com.pro.subject.exception.custom.NotFoundSubjectException
+import com.pro.subject.exception.custom.UnAuthorizedTeamMemberException
 import com.pro.subject.repository.GradeRepository
 import com.pro.subject.repository.SubjectRepository
 import com.pro.subject.repository.TestCaseRepository
 import com.pro.subject.service.SubjectService
+import feign.FeignException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,6 +29,8 @@ class SubjectServiceImplement: SubjectService {
     @Autowired
     private lateinit var gradeRepository: GradeRepository
     @Autowired
+    private lateinit var teamServiceClient: TeamServiceClient
+    @Autowired
     private lateinit var execServiceClient: ExecServiceClient
 
     @Transactional(readOnly = true)
@@ -32,37 +39,29 @@ class SubjectServiceImplement: SubjectService {
 
     @Transactional(readOnly = true)
     override fun getSubject(subjectId: Long) =
-        SubjectResponse.of(subjectRepository.findById(subjectId).get())
-    /** TODO(Exception 처리) **/
+        SubjectResponse.of(subjectRepository.findById(subjectId)
+            .orElseThrow{ throw NotFoundSubjectException() })
 
     @Transactional
     override fun setSubject(uuid: String, subjectRequest: SubjectRequest): Long? {
-        // TODO(사용자에 따른 팀 인증)
-        val subject = subjectRepository.save(subjectRequest.toEntity(uuid))
-        var testCaseList = mutableListOf<TestCase>()
+        validateTeamMember(uuid, subjectRequest.teamId)
 
-        for (testArgument in subjectRequest.testArguments) {
-            testCaseList.add(
-                TestCase(subject, testArgument.testArgument, testArgument.matchResult)
-            )
-        }
+        val subject = subjectRepository.save(subjectRequest.toEntity(uuid))
+        val testCaseList = subjectRequest.testArguments.map { testArgument -> TestCase(subject, testArgument.testArgument, testArgument.matchResult) }
 
         testCaseRepository.saveAll(testCaseList)
-
         return subject.id
     }
 
     @Transactional
     override fun setGrade(uuid: String, gradeRequest: GradeRequest): ExecResponse {
-        // TODO(Exception 처리)
-        // TODO(사용자에 따른 팀 인증)
-        val subject = subjectRepository.findById(gradeRequest.subjectId).get()
-        val testCase = testCaseRepository.findBySubject(subject)
+        val subject = subjectRepository.findById(gradeRequest.subjectId)
+            .orElseThrow { throw NotFoundSubjectException() }
 
-        // TODO(FeignClient 예외처리)
-        val execResponse = execServiceClient.matchTestCases(
-            ExecRequest(uuid, gradeRequest.subjectId, gradeRequest.testCode, TestArgumentRequest.listOf(testCase), gradeRequest.codeType)
-        )
+        validateTeamMember(uuid, subject.teamId)
+
+        val testCase = testCaseRepository.findBySubject(subject)
+        val execResponse = gradingCode(uuid, gradeRequest, TestArgumentRequest.listOf(testCase))
 
         gradeRepository.save(gradeRequest.toEntity(uuid, execResponse, subject))
 
@@ -71,20 +70,48 @@ class SubjectServiceImplement: SubjectService {
 
     @Transactional(readOnly = true)
     override fun getGradeBySubjectAndUUID(uuid: String, subjectId: Long): List<GradeResponse> {
-        // TODO(Exception 처리)
-        // TODO(사용자에 따른 팀 인증)
-        val subject = subjectRepository.findById(subjectId).get()
+        val subject = subjectRepository.findById(subjectId)
+            .orElseThrow { throw NotFoundSubjectException() }
+
+        validateTeamMember(uuid, subject.teamId)
+
         return GradeResponse.listOf(gradeRepository.findBySubjectAndUuid(subject, uuid))
     }
 
     @Transactional(readOnly = true)
     override fun getGradeBySubject(subjectId: Long): List<GradeResponse> {
-        // TODO(Exception 처리)
-        val subject = subjectRepository.findById(subjectId).get()
+        val subject = subjectRepository.findById(subjectId)
+            .orElseThrow{ throw NotFoundSubjectException() }
         return GradeResponse.listOf(gradeRepository.findBySubject(subject))
     }
 
     @Transactional(readOnly = true)
     override fun getGradeByUUID(uuid: String) =
         GradeResponse.listOf(gradeRepository.findByUuid(uuid))
+
+    private fun gradingCode(
+        uuid: String,
+        gradeRequest: GradeRequest,
+        testCaseArguments: List<TestArgumentRequest>
+    ): ExecResponse {
+        return try {
+            execServiceClient.matchTestCases(
+                ExecRequest(uuid, gradeRequest.subjectId, gradeRequest.testCode, testCaseArguments, gradeRequest.codeType)
+            )
+        } catch (e: FeignException) {
+            ExecResponse(ResultType.COMPILE_ERROR, "Feign Exception, Must be check the server")
+        }
+    }
+
+    private fun validateTeamMember(uuid: String, teamId: Long) {
+        try {
+            val memberValidateResponse = teamServiceClient.validateUserTargetTeamMember(uuid, teamId)
+
+            if (!memberValidateResponse.result) {
+                throw UnAuthorizedTeamMemberException()
+            }
+        } catch (e: FeignException) {
+            throw UnAuthorizedTeamMemberException()
+        }
+    }
 }
