@@ -1,9 +1,9 @@
-package com.pro.user.exception
+package com.pro.subject.exception
 
+import com.pro.subject.exception.custom.CustomException
 import com.pro.subject.exception.custom.NotFoundSubjectException
 import com.pro.subject.exception.custom.UnAuthorizedTeamMemberException
-import com.pro.user.exception.custom.*
-import com.pro.user.exception.message.ErrorBody
+import com.pro.subject.exception.message.ErrorBody
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler

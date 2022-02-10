@@ -1,4 +1,4 @@
-package com.pro.user.exception.message
+package com.pro.subject.exception.message
 
 import org.springframework.http.HttpStatus
 
