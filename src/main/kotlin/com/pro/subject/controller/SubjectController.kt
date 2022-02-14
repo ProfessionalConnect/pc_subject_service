@@ -24,15 +24,17 @@ class SubjectController {
     @GetMapping("/ms/teams/{teamId}")
     fun getSubjectsByTeamId(
         @PathVariable teamId: Long,
+        @RequestHeader(value = "uuid") uuid: String,
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC, size = 4) pageable: Pageable
     ): ResponseEntity<Page<SubjectResponse>> =
-        ResponseEntity.ok(subjectService.getSubjectsByTeamId(teamId, pageable))
+        ResponseEntity.ok(subjectService.getSubjectsByTeamId(uuid, teamId, pageable))
 
     @GetMapping("/ms/{subjectId}")
     fun getSubject(
         @PathVariable subjectId: Long,
+        @RequestHeader(value = "uuid") uuid: String
     ): ResponseEntity<SubjectResponse> =
-        ResponseEntity.ok(subjectService.getSubject(subjectId))
+        ResponseEntity.ok(subjectService.getSubject(uuid, subjectId))
 
     @PostMapping("/ps")
     fun setSubject(

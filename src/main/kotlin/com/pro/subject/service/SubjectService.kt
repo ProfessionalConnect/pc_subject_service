@@ -9,8 +9,8 @@ import org.springframework.data.domain.Pageable
  */
 
 interface SubjectService {
-    fun getSubjectsByTeamId(teamId: Long, pageable: Pageable): Page<SubjectResponse>
-    fun getSubject(subjectId: Long): SubjectResponse
+    fun getSubjectsByTeamId(uuid: String, teamId: Long, pageable: Pageable): Page<SubjectResponse>
+    fun getSubject(uuid: String, subjectId: Long): SubjectResponse
     fun setSubject(uuid: String, subjectRequest: SubjectRequest): Long?
     fun setGrade(uuid: String, gradeRequest: GradeRequest): ExecResponse
     fun getGradeBySubjectAndUUID(uuid: String, subjectId: Long): List<GradeResponse>

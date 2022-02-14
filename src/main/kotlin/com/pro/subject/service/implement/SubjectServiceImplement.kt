@@ -37,15 +37,18 @@ class SubjectServiceImplement: SubjectService {
     private lateinit var execServiceClient: ExecServiceClient
 
     @Transactional(readOnly = true)
-    override fun getSubjectsByTeamId(teamId: Long, pageable: Pageable): Page<SubjectResponse> {
+    override fun getSubjectsByTeamId(uuid: String, teamId: Long, pageable: Pageable): Page<SubjectResponse> {
+        validateTeamMember(uuid, teamId)
         val subjects = subjectRepository.findByTeamId(teamId, pageable)
         return PageImpl(SubjectResponse.listOf(subjects.content), pageable, subjects.totalElements)
     }
 
     @Transactional(readOnly = true)
-    override fun getSubject(subjectId: Long) =
-        SubjectResponse.of(subjectRepository.findById(subjectId)
-            .orElseThrow{ throw NotFoundSubjectException() })
+    override fun getSubject(uuid: String, subjectId: Long): SubjectResponse {
+        val subject = subjectRepository.findById(subjectId).orElseThrow{ throw NotFoundSubjectException() }
+        validateTeamMember(uuid, subject.teamId)
+        return SubjectResponse.of(subject)
+    }
 
     @Transactional
     override fun setSubject(uuid: String, subjectRequest: SubjectRequest): Long? {
