@@ -1,6 +1,8 @@
 package com.pro.subject.dto
 
+import com.pro.subject.domain.ResultType
 import com.pro.subject.domain.Subject
+import java.time.LocalDateTime
 
 /**
  * Created by Minky on 2022-02-05
@@ -12,10 +14,23 @@ data class SubjectResponse(
     val title: String,
     val description: String,
     val codeType: String,
+    val createdDate: LocalDateTime,
+    val lastModifiedDate: LocalDateTime,
+    val isPass: Boolean
 ) {
     companion object {
         fun of(subject: Subject): SubjectResponse =
-            SubjectResponse(subject.id, subject.teamId, subject.uuid, subject.title, subject.description, subject.codeType.name)
+            SubjectResponse(
+                subject.id,
+                subject.teamId,
+                subject.uuid,
+                subject.title,
+                subject.description,
+                subject.codeType.name,
+                subject.createdDate,
+                subject.lastModifiedDate,
+                subject.gradeList.any {grade -> grade.resultType == ResultType.SUCCESS }
+            )
 
         fun listOf(subjectList: List<Subject>): List<SubjectResponse> =
             subjectList.map(SubjectResponse::of)
