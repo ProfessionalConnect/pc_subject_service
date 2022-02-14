@@ -13,7 +13,7 @@ interface SubjectService {
     fun getSubject(uuid: String, subjectId: Long): SubjectResponse
     fun setSubject(uuid: String, subjectRequest: SubjectRequest): Long?
     fun setGrade(uuid: String, gradeRequest: GradeRequest): ExecResponse
-    fun getGradeBySubjectAndUUID(uuid: String, subjectId: Long): List<GradeResponse>
-    fun getGradeBySubject(subjectId: Long): List<GradeResponse>
+    fun getGradeBySubjectAndUUID(uuid: String, subjectId: Long, pageable: Pageable): Page<GradeResponse>
+    fun getGradeBySubject(subjectId: Long, pageable: Pageable): Page<GradeResponse>
     fun getGradeByUUID(uuid: String): List<GradeResponse>
 }

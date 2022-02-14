@@ -47,9 +47,10 @@ class SubjectController {
 
     @GetMapping("/ps/{subjectId}/grades")
     fun getGradeBySubject(
-        @PathVariable subjectId: Long
-    ): ResponseEntity<List<GradeResponse>> =
-        ResponseEntity.ok(subjectService.getGradeBySubject(subjectId))
+        @PathVariable subjectId: Long,
+        @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC, size = 8) pageable: Pageable
+    ): ResponseEntity<Page<GradeResponse>> =
+        ResponseEntity.ok(subjectService.getGradeBySubject(subjectId, pageable))
 
     @PostMapping("/ss/register")
     fun setGrade(
@@ -61,9 +62,10 @@ class SubjectController {
     @GetMapping("/ss/{subjectId}/grades")
     fun getGradeBySubjectAndUUID(
         @RequestHeader(value = "uuid") uuid: String,
-        @PathVariable subjectId: Long
-    ): ResponseEntity<List<GradeResponse>> =
-        ResponseEntity.ok(subjectService.getGradeBySubjectAndUUID(uuid, subjectId))
+        @PathVariable subjectId: Long,
+        @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC, size = 8) pageable: Pageable
+    ): ResponseEntity<Page<GradeResponse>> =
+        ResponseEntity.ok(subjectService.getGradeBySubjectAndUUID(uuid, subjectId, pageable))
 
     @GetMapping("/ss/grades")
     fun getGradeByUUID(

@@ -77,20 +77,22 @@ class SubjectServiceImplement: SubjectService {
     }
 
     @Transactional(readOnly = true)
-    override fun getGradeBySubjectAndUUID(uuid: String, subjectId: Long): List<GradeResponse> {
+    override fun getGradeBySubjectAndUUID(uuid: String, subjectId: Long, pageable: Pageable): Page<GradeResponse> {
         val subject = subjectRepository.findById(subjectId)
             .orElseThrow { throw NotFoundSubjectException() }
 
         validateTeamMember(uuid, subject.teamId)
-
-        return GradeResponse.listOf(gradeRepository.findBySubjectAndUuid(subject, uuid))
+        val grades = gradeRepository.findBySubjectAndUuid(subject, uuid, pageable)
+        return PageImpl(GradeResponse.listOf(grades.content), pageable, grades.totalElements)
     }
 
     @Transactional(readOnly = true)
-    override fun getGradeBySubject(subjectId: Long): List<GradeResponse> {
+    override fun getGradeBySubject(subjectId: Long, pageable: Pageable): Page<GradeResponse> {
         val subject = subjectRepository.findById(subjectId)
             .orElseThrow{ throw NotFoundSubjectException() }
-        return GradeResponse.listOf(gradeRepository.findBySubject(subject))
+
+        val grades = gradeRepository.findBySubject(subject, pageable)
+        return PageImpl(GradeResponse.listOf(grades.content), pageable, grades.totalElements)
     }
 
     @Transactional(readOnly = true)
