@@ -13,6 +13,9 @@ import com.pro.subject.repository.TestCaseRepository
 import com.pro.subject.service.SubjectService
 import feign.FeignException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -34,8 +37,10 @@ class SubjectServiceImplement: SubjectService {
     private lateinit var execServiceClient: ExecServiceClient
 
     @Transactional(readOnly = true)
-    override fun getSubjectsByTeamId(teamId: Long) =
-        SubjectResponse.listOf(subjectRepository.findByTeamId(teamId))
+    override fun getSubjectsByTeamId(teamId: Long, pageable: Pageable): Page<SubjectResponse> {
+        val subjects = subjectRepository.findByTeamId(teamId, pageable)
+        return PageImpl(SubjectResponse.listOf(subjects.content), pageable, subjects.totalElements)
+    }
 
     @Transactional(readOnly = true)
     override fun getSubject(subjectId: Long) =
