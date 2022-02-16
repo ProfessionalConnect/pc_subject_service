@@ -1,6 +1,7 @@
 package com.pro.subject.exception
 
 import com.pro.subject.exception.custom.CustomException
+import com.pro.subject.exception.custom.FeignClientException
 import com.pro.subject.exception.custom.NotFoundSubjectException
 import com.pro.subject.exception.custom.UnAuthorizedTeamMemberException
 import com.pro.subject.exception.message.ErrorBody
@@ -30,6 +31,11 @@ class CustomExceptionHandler {
     @ExceptionHandler(NotFoundSubjectException::class)
     @ResponseBody
     fun handleNotFoundSubjectException(e: NotFoundSubjectException): ResponseEntity<ErrorBody> =
+        ResponseEntity(getErrorBody(e), getHttpStatus(e))
+
+    @ExceptionHandler(FeignClientException::class)
+    @ResponseBody
+    fun handleFeignClientException(e: FeignClientException): ResponseEntity<ErrorBody> =
         ResponseEntity(getErrorBody(e), getHttpStatus(e))
 
     private fun getHttpStatus(e: CustomException): HttpStatus =

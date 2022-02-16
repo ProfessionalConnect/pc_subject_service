@@ -10,6 +10,7 @@ enum class ErrorCode(
     val message: String,
     val httpStatus: HttpStatus
 ) {
+    FEIGN_CLIENT_ERROR(500, "[ERROR] Server Network not working, Please call Manager", HttpStatus.INTERNAL_SERVER_ERROR),
     UNAUTHORIZED_TEAM_MEMBER(401, "[ERROR] You are not join this Team, check your team list", HttpStatus.UNAUTHORIZED),
     NOT_FOUND_SUBJECT(404, "[ERROR] Subject is not found", HttpStatus.NOT_FOUND), ;
 }
