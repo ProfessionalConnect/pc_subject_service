@@ -2,9 +2,11 @@ package com.pro.subject.service.implement
 
 import com.pro.subject.client.ExecServiceClient
 import com.pro.subject.client.TeamServiceClient
+import com.pro.subject.client.UserServiceClient
 import com.pro.subject.domain.ResultType
 import com.pro.subject.domain.TestCase
 import com.pro.subject.dto.*
+import com.pro.subject.exception.custom.FeignClientException
 import com.pro.subject.exception.custom.NotFoundSubjectException
 import com.pro.subject.exception.custom.UnAuthorizedTeamMemberException
 import com.pro.subject.repository.GradeRepository
@@ -18,6 +20,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Created by Minky on 2022-02-05
@@ -35,19 +38,31 @@ class SubjectServiceImplement: SubjectService {
     private lateinit var teamServiceClient: TeamServiceClient
     @Autowired
     private lateinit var execServiceClient: ExecServiceClient
+    @Autowired
+    private lateinit var userServiceClient: UserServiceClient
 
     @Transactional(readOnly = true)
     override fun getSubjectsByTeamId(uuid: String, teamId: Long, pageable: Pageable): Page<SubjectResponse> {
         validateTeamMember(uuid, teamId)
         val subjects = subjectRepository.findByTeamId(teamId, pageable)
-        return PageImpl(SubjectResponse.listOf(subjects.content), pageable, subjects.totalElements)
+        val userMap = getUserMap(subjects.content.map { subject -> subject.uuid })
+
+        val subjectResponses = SubjectResponse.listOf(subjects.content)
+        setUsersInSubjects(subjectResponses, userMap)
+
+        return PageImpl(subjectResponses, pageable, subjects.totalElements)
     }
 
     @Transactional(readOnly = true)
     override fun getSubject(uuid: String, subjectId: Long): SubjectResponse {
         val subject = subjectRepository.findById(subjectId).orElseThrow{ throw NotFoundSubjectException() }
         validateTeamMember(uuid, subject.teamId)
-        return SubjectResponse.of(subject)
+        val userMap = getUserMap(listOf(subject.uuid))
+
+        val subjectResponse = SubjectResponse.of(subject)
+        setUsersInSubject(subjectResponse, userMap)
+
+        return subjectResponse
     }
 
     @Transactional
@@ -83,7 +98,12 @@ class SubjectServiceImplement: SubjectService {
 
         validateTeamMember(uuid, subject.teamId)
         val grades = gradeRepository.findBySubjectAndUuid(subject, uuid, pageable)
-        return PageImpl(GradeResponse.listOf(grades.content), pageable, grades.totalElements)
+        val userMap = getUserMap(grades.content.map { grade -> grade.uuid })
+
+        val gradeResponses = GradeResponse.listOf(grades.content)
+        setUsersInGrades(gradeResponses, userMap)
+
+        return PageImpl(gradeResponses, pageable, grades.totalElements)
     }
 
     @Transactional(readOnly = true)
@@ -92,12 +112,58 @@ class SubjectServiceImplement: SubjectService {
             .orElseThrow{ throw NotFoundSubjectException() }
 
         val grades = gradeRepository.findBySubject(subject, pageable)
-        return PageImpl(GradeResponse.listOf(grades.content), pageable, grades.totalElements)
+        val userMap = getUserMap(grades.content.map { grade -> grade.uuid })
+
+        val gradeResponses = GradeResponse.listOf(grades.content)
+        setUsersInGrades(gradeResponses, userMap)
+
+        return PageImpl(gradeResponses, pageable, grades.totalElements)
     }
 
     @Transactional(readOnly = true)
     override fun getGradeByUUID(uuid: String) =
         GradeResponse.listOf(gradeRepository.findByUuid(uuid))
+
+    private fun getUserMap(
+        uuidList: List<String>
+    ): ConcurrentHashMap<String, UserResponse> {
+        return try {
+            UserDetailResponse.mapOf(userServiceClient.getUsersByUuid(
+                    listToDetailRequests(uuidList)))
+        } catch (e: FeignException) {
+            throw FeignClientException()
+        }
+    }
+
+    private fun setUsersInSubject(
+        subjectResponse: SubjectResponse,
+        userMap: ConcurrentHashMap<String, UserResponse>
+    ) {
+        if (userMap.containsKey(subjectResponse.uuid)) {
+            subjectResponse.user = userMap[subjectResponse.uuid]
+        }
+    }
+
+    private fun setUsersInSubjects(
+        subjectResponses: List<SubjectResponse>,
+        userMap: ConcurrentHashMap<String, UserResponse>
+    ) = subjectResponses.forEach { it ->
+        if (userMap.containsKey(it.uuid)) {
+            it.user = userMap[it.uuid]
+        }
+    }
+
+    private fun setUsersInGrades(
+        gradeResponses: List<GradeResponse>,
+        userMap: ConcurrentHashMap<String, UserResponse>
+    ) = gradeResponses.forEach { it ->
+        if (userMap.containsKey(it.uuid)) {
+            it.user = userMap[it.uuid]
+        }
+    }
+
+    private fun listToDetailRequests(uuidList: List<String>): List<DetailRequest> =
+        uuidList.map { it -> DetailRequest(it) }
 
     private fun gradingCode(
         uuid: String,

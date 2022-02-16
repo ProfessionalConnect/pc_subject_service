@@ -1,5 +1,6 @@
 package com.pro.subject.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.pro.subject.domain.ResultType
 import com.pro.subject.domain.Subject
 import java.time.LocalDateTime
@@ -7,6 +8,8 @@ import java.time.LocalDateTime
 /**
  * Created by Minky on 2022-02-05
  */
+
+@JsonIgnoreProperties(value = ["uuid"])
 data class SubjectResponse(
     val id: Long?,
     val teamId: Long,
@@ -16,7 +19,8 @@ data class SubjectResponse(
     val codeType: String,
     val createdDate: LocalDateTime,
     val lastModifiedDate: LocalDateTime,
-    val isPass: Boolean
+    val isPass: Boolean,
+    var user: UserResponse? = null
 ) {
     companion object {
         fun of(subject: Subject): SubjectResponse =
