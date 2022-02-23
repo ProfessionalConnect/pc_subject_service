@@ -24,7 +24,7 @@ class Grade(
     @Column(nullable = false)
     var uuid = uuid
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10000)
     var testCode = testCode
 
     @Column(nullable = false)

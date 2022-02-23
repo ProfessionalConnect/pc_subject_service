@@ -31,7 +31,7 @@ class Subject(
     @Column(nullable = false)
     var title = title
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10000)
     var description = description
 
     @Column(nullable = false)
